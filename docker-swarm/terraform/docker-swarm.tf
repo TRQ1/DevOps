@@ -1,13 +1,13 @@
 provider "google" {
   credentials = "${file("${var.key_json}")}"
-  project     = "${var.gcp-project-id}"
-  region      = "${var.resource_zone}"
+  project     = "${var.gcp_project_id}"
+  region      = "${var.gcp_region}"
 }
 
 resource "google_compute_instance" "swarm-manager" {
   name         = "${var.swarm_manager_jenkins}"
   machine_type = "${var.swarm_instance_type}"
-  zone         = "${var.resource_zone}"
+  zone         = "${var.gcp_zone}"
 
   tags = ["swarm-manager"]
 
@@ -26,9 +26,9 @@ resource "google_compute_instance" "swarm-manager" {
       "echo ${var.doker_secret_jekins_id} | docker secret create jenkins-user -", 
       "echo ${var.doker_secret_jekins_pass} | docker secret create jenkins-pass -", 
       "echo `-master http://master:8080 -password ${var.doker_secret_jekins_pass} -username ${var.doker_secret_jekins_id}`|docker secret create jenkins -",
-      "export JENKINS_IMAGE=$(docker images | grep my/jenkins |awk '{print $3}')",
-      "docker tag $JENKINS_IMAGE ${var.gcp_hostname}/${var.gcp-project-id}/${var.image_name}",
-      "gcloud docker -- push ${var.gcp_hostname}/${var.gcp-project-id}/${var.image_name}",
+      "export JENKINS_IMAGE=$(docker images | grep ${var.image_name} |awk '{print $3}')",
+      "docker tag $JENKINS_IMAGE ${var.gcp_hostname}/${var.gcp_project_id}/${var.image_name}",
+      "gcloud docker -- push ${var.gcp_hostname}/${var.gcp_project_id}/${var.image_name}",
       "docker stack deploy -c ~/jenkins/docker-compose.yml jenkins;"
     ]
   }
@@ -42,7 +42,7 @@ resource "google_compute_instance" "swarm-manager" {
 resource "google_compute_instance" "swarm-worker" {
   name         = "${var.swarm_workers_name}"
   machine_type = "${var.swarm_instance_type}"
-  zone         = "${var.resource_zone}"
+  zone         = "${var.gcp_zone}"
 
   tags = ["swarm-worker"]
 
@@ -56,8 +56,8 @@ resource "google_compute_instance" "swarm-worker" {
  }
   provisioner "remote-exec" {
     inline = [
-      "gcloud docker -- pull ${var.gcp_hostname}/${var.gcp-project-id}/${var.image_name}",
-      "docker swarm join ${google_compute_instance.swarm-manager.network_interface.0.address}:2377 --token $(docker -H ${google_compute_instance.swarm-manager.network_interface.0.address} swarm join-token -q worker)"
+      "gcloud docker -- pull ${var.gcp_hostname}/${var.gcp_project_id}/${var.image_name}",
+      "docker swarm join ${google_compute_instance.swarm-manager.network_interface.0.address}:2377 --token ${var.swarm_manager_token} swarm join-token -q worker)"
     ]
  }
   connection {

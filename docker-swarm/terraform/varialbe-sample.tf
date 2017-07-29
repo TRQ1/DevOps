@@ -25,10 +25,13 @@ variable "swarm_manager_jenkins" {
 variable "swarm_workers_name" {
   default = ""
 }
-variable "resource_zone" {
+variable "gcp_region" {
   default = ""
 }
-variable "gcp-project-id" {
+variable "gcp_zone" {
+  default = ""
+}
+variable "gcp_project_id" {
   default = ""
 }
 variable "key_json" {
