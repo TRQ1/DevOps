@@ -1,0 +1,30 @@
+version: '3.3'
+ 
+services:
+ 
+  master:
+    image: ${JENKINS_IMAGE:-my/jenkins}
+    ports:
+      - ${JENKINS_PORT:-4749}:8080
+    secrets:
+      - jenkins-user
+      - jenkins-pass
+
+   
+  slave:
+    image: vipconsult/jenkins-swarm-agent
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp:/tmp
+    secrets:
+      - jenkins
+    depends_on:
+      - master
+
+secrets:       
+  jenkins-user:
+    external: true
+  jenkins-pass:
+    external: true
+  jenkins:
+    external: true

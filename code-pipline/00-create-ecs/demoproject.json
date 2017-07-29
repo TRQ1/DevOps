@@ -1,0 +1,39 @@
+{
+  "containerDefinitions": [
+    {
+      "name": "demorepo",
+      "image": "766435846433.dkr.ecr.us-east-2.amazonaws.com/demorepo:latest",
+      "cpu": 100,
+      "memoryReservation": 128,
+      "essential": true,
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "containerPort": 3000,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "MONGO_URL",
+          "value": "mongodb://mongo:27017/realgrid"
+        },
+        {
+          "name": "ROOT_URL",
+          "value": "http://localhost"
+        }
+      ],
+      "links": [
+        "mondb:mondb"
+      ]
+    },
+    {
+      "name": "mongo",
+      "image": "mongo:latest",
+      "cpu": 100,
+      "memoryReservation": 128,
+      "essential": true
+    }
+  ],
+  "family": "demoproject-01"
+}

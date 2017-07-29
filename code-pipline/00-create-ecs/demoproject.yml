@@ -1,0 +1,18 @@
+version: '2'
+services:
+  base-staging:
+    image:766435846433.dkr.ecr.us-east-2.amazonaws.com/demorepo 
+    cpu_shares: 100
+    # mem_limit: xxx(byte)
+    mem_reservation: 134217728
+    ports:
+      - "80:3000"
+    links:
+      - mondb:mondb
+    environment:
+      - ROOT_URL=http://localhost
+      - MONGO_URL=mongodb://mongo:27017/realgrid
+  mongo:
+    image: mongo:latest
+    cpu_shares: 100
+    mem_reservation: 134217728

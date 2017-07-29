@@ -1,0 +1,10 @@
+# Get installed plugins.txt
+JENKINS_HOST=admin:admin@
+curl -sSL "http://$JENKINS_HOST/pluginManager/api/xml?depth=1&xpath=/*/*/shortName|/*/*/version&wrapper=plugins" | perl -pe 's/.*?<shortName>([\w-]+).*?<version>([^<]+)()(<\/\w+>)+/\1 \2\n/g'|sed 's/ /:/' > plugins.txt
+
+#Packer build
+packer build -var-file=secret/secret-env.json build-defition.json
+
+#Terraform command
+terraform paln  terraform/
+terraform apply terraform/.

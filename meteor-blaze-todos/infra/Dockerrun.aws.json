@@ -1,0 +1,36 @@
+{
+  "AWSEBDockerrunVersion": 2,
+  "containerDefinitions": [
+    {
+      "name": "meteor",
+      "image": "766435846433.dkr.ecr.us-east-2.amazonaws.com/demorepo:latest",
+      "essential": true,
+      "memory": 1024,
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "containerPort": 3000
+        }
+      ],
+      "environment": [
+        {
+          "name": "ROOT_URL",
+          "value": "http://localhost"
+        },
+        {
+          "name": "MONGO_URL",
+          "value": "mongodb://mongo:27017/meteor"
+        }
+      ],
+          "links": [
+            "mongo"
+      ]
+    },
+    {
+      "name": "mongo",
+      "image": "mongo:latest",
+      "essential": true,
+      "memory": 1024
+    }
+  ]
+}

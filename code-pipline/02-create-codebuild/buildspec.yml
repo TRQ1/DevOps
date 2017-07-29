@@ -1,0 +1,22 @@
+version: 0.1
+            
+phases:
+  install:
+    commands:
+      - echo install phase start
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - $(aws ecr get-login --region $AWS_DEFAULT_REGION)
+  build:
+    commands:
+      - echo Build started on `date`
+      - docker build --build-arg TOOL_NODE_FLAGS="--max-old-space-size=2048" -f infra/Dockerfile -t $REPO_NAME .
+      - docker tag $REPO_NAME $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$REPO_NAME:$IMAGE_TAG
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$REPO_NAME:$IMAGE_TAG
+  artifacts:
+    files:
+      - '.gitignore'

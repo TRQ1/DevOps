@@ -1,0 +1,35 @@
+{
+    "name": "demorepo",
+    "description": "codebuild for realgrid's base staging envrionment",
+    "source": {
+        "type": "CODEPIPELINE",
+    "buildspec": "meteor-blaze-todos/infra/buildspec.yml"
+    },
+    "artifacts": {
+        "type": "CODEPIPELINE"
+    },
+    "environment": {
+        "type": "LINUX_CONTAINER",
+        "image": "aws/codebuild/docker:1.12.1",
+        "computeType": "BUILD_GENERAL1_SMALL",
+        "environmentVariables": [
+           {
+             "name": "AWS_DEFAULT_REGION",
+             "value": "us-east-2"
+           },
+           {
+             "name": "REPO_NAME",
+             "value": "demorepo"
+           },
+           {
+             "name": "IMAGE_TAG",
+             "value": "latest"
+           },
+           {
+             "name": "AWS_ACCOUNT_ID",
+             "value": "766435846433"
+           }
+        ]
+    },
+    "serviceRole": "arn:aws:iam::766435846433:role/service-role/codebuild-Demoproject-service-role"
+}
