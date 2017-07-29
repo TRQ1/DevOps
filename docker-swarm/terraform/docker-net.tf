@@ -13,6 +13,6 @@ resource "google_compute_firewall" "default" {
 
   allow {
     protocol = "tcp"
-    ports    = ["22", "80", "443", "8080", "2377", "2375", "7946", "4789",]
+    ports    = ["22", "80", "443", "8080", "2377", "2375", "7946", "4789", "4749"]
   }
 }
