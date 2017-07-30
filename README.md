@@ -9,10 +9,11 @@
 - AWS CodePipeline: use it to automate the deployment steps.
 - AWS Lambda:
 
-# Will add
+# Will do
 - Cloudformation
 
 # Do now
 - Build a Docker container with jenkins by using Packer
 - Provision the images to Google Compute Engine by using Terraform
+- Creating and Scaling a Docker Swarm Cluster with Terraform
 
