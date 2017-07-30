@@ -9,7 +9,7 @@
 - AWS CodePipeline: use it to automate the deployment steps.
 - AWS Lambda:
 
-# Will add
+# Will do
 - Cloudformation
 
 # Do now
