@@ -61,3 +61,6 @@ variable "user_id" {
 variable "connect_key" {
   default = ""
 }
+variable "ssh_key_file" {
+  default = ""
+}

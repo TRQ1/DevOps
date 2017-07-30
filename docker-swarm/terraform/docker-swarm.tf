@@ -17,19 +17,20 @@ resource "google_compute_instance" "swarm-manager" {
 
   network_interface {
     network = "docker-net"
+#    subnetwork = "${google_compute_subnetwork.default-asia-northeast1.name}"
     access_config = {}
   }
   provisioner "remote-exec" {
     inline = [
       "if ! ${var.swarm_init}; then docker swarm init; fi",
-#      "if ! ${var.swarm_init}; then docker swarm join --token ${var.swarm_manage\ r_token} --advertise-addr ${self.private_ip} ${var.swarm_manager_ip}:2377; fi"
       "echo ${var.doker_secret_jekins_id} | docker secret create jenkins-user -", 
       "echo ${var.doker_secret_jekins_pass} | docker secret create jenkins-pass -", 
       "echo `-master http://master:8080 -password ${var.doker_secret_jekins_pass} -username ${var.doker_secret_jekins_id}`|docker secret create jenkins -",
-      "export JENKINS_IMAGE=$(docker images | grep ${var.image_name} |awk '{print $3}')",
-      "docker tag $JENKINS_IMAGE ${var.gcp_hostname}/${var.gcp_project_id}/${var.image_name}",
+      "export FRIST_JENKINS_IMAGE=$(docker images | grep ${var.image_name} |awk '{print $3}')",
+      "docker tag $FRIST_JENKINS_IMAGE ${var.gcp_hostname}/${var.gcp_project_id}/${var.image_name}",
       "gcloud docker -- push ${var.gcp_hostname}/${var.gcp_project_id}/${var.image_name}",
-      "docker stack deploy -c ~/jenkins/docker-compose.yml jenkins;"
+      "export JENKINS_IMAGE=$(docker images | grep ${var.gcp_project_id} | awk '{print $1}')",
+      "docker stack deploy -c ~/jenkins/docker-compose.yml jenkins"
     ]
   }
   
@@ -52,12 +53,19 @@ resource "google_compute_instance" "swarm-worker" {
 
   network_interface {
     network = "docker-net"
+#    subnetwork = "${google_compute_subnetwork.default-asia-northeast1.name}"
     access_config = {}
  }
+  provisioner "file" {
+    source = "${var.ssh_key_file}"
+    destination = "/home/ubuntu/key"
+}
   provisioner "remote-exec" {
     inline = [
       "gcloud docker -- pull ${var.gcp_hostname}/${var.gcp_project_id}/${var.image_name}",
-      "docker swarm join ${google_compute_instance.swarm-manager.network_interface.0.address}:2377 --token ${var.swarm_manager_token} swarm join-token -q worker)"
+      "export WORKER=$(sudo ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i key ${var.user_id}@${google_compute_instance.swarm-manager.network_interface.0.address} docker swarm join-token worker -q)",
+      "docker swarm join ${google_compute_instance.swarm-manager.network_interface.0.address}:2377 --token $WORKER",
+      "rm -f ~/key"
     ]
  }
   connection {
