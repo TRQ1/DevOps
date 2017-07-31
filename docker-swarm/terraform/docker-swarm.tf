@@ -64,7 +64,7 @@ resource "google_compute_instance" "swarm-manager" {
   provisioner "remote-exec" {
     inline = [
       "gcloud docker -- pull ${var.gcp_hostname}/${var.gcp_project_id}/${var.image_name}",
-      "export WORKER=$(sudo ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i key ${var.user_id}@                      ${google_compute_instance.swarm-manager-main.network_interface.0.address} docker swarm join-token manager)",
+      "export WORKER=$(sudo ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i key ${var.user_id}@${google_compute_instance.swarm-manager-main.network_interface.0.address} docker swarm join-token manager)",
       "docker swarm join ${google_compute_instance.swarm-manager.network_interface.0.address}:2377 --token $WORKER",
       "rm -f ~/key" 
     ]
