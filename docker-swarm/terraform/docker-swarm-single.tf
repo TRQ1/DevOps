@@ -4,12 +4,12 @@ provider "google" {
   region      = "${var.gcp_region}"
 }
 
-resource "google_compute_instance" "swarm-manager-main" {
-  name         = "${var.swarm_manager_jenkins_main}"
+resource "google_compute_instance" "swarm-manager" {
+  name         = "${var.swarm_manager_jenkins}"
   machine_type = "${var.swarm_instance_type}"
   zone         = "${var.gcp_zone}"
 
-  tags = ["swarm-manager-main"]
+  tags = ["swarm-manager"]
 
   disk {
     image = "${var.master_source_disk_image}"
@@ -40,51 +40,12 @@ resource "google_compute_instance" "swarm-manager-main" {
   }
 }
 
-
-resource "google_compute_instance" "swarm-manager" {
-  name         = "${var.swarm_manager_jenkins}-${count.index}"
-  machine_type = "${var.swarm_instance_type}"
-  zone         = "${var.gcp_zone}"
-
-  tags = ["swarm-manager-${count.index}"]
-
-  disk {
-    image = "${var.master_source_disk_image}"
-  }
-
-  network_interface {
-    network = "docker-net"
-#    subnetwork = "${google_compute_subnetwork.default-asia-northeast1.name}"
-    access_config = {}
-  }
-  provisioner "file" {
-    source = "${var.ssh_key_file}"
-    destination = "/home/ubuntu/key"
-}
-  provisioner "remote-exec" {
-    inline = [
-      "gcloud docker -- pull ${var.gcp_hostname}/${var.gcp_project_id}/${var.image_name}",
-      "export WORKER=$(sudo ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i key ${var.user_id}@                      ${google_compute_instance.swarm-manager-main.network_interface.0.address} docker swarm join-token manager)",
-      "docker swarm join ${google_compute_instance.swarm-manager.network_interface.0.address}:2377 --token $WORKER",
-      "rm -f ~/key" 
-    ]
-  }
-  
-  connection {
-    user     = "${var.user_id}"
-    private_key  = "${file("${var.connect_key}")}"
-  }
-}
-
-
-
 resource "google_compute_instance" "swarm-worker" {
-  count        = "${var.swarm_workers}"
-  name         = "${var.swarm_workers_name}-${count.index}"
+  name         = "${var.swarm_workers_name}"
   machine_type = "${var.swarm_instance_type}"
   zone         = "${var.gcp_zone}"
 
-  tags = ["swarm-worker-${count.index}"]
+  tags = ["swarm-worker"]
 
   disk {
     image = "${var.worker_source_disk_image}"
@@ -102,8 +63,8 @@ resource "google_compute_instance" "swarm-worker" {
   provisioner "remote-exec" {
     inline = [
       "gcloud docker -- pull ${var.gcp_hostname}/${var.gcp_project_id}/${var.image_name}",
-      "export WORKER=$(sudo ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i key ${var.user_id}@${google_compute_instance.swarm-manager-main.network_interface.0.address} docker swarm join-token worker -q)",
-      "docker swarm join ${google_compute_instance.swarm-manager-main.network_interface.0.address}:2377 --token $WORKER",
+      "export WORKER=$(sudo ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i key ${var.user_id}@${google_compute_instance.swarm-manager.network_interface.0.address} docker swarm join-token worker -q)",
+      "docker swarm join ${google_compute_instance.swarm-manager.network_interface.0.address}:2377 --token $WORKER",
       "rm -f ~/key"
     ]
  }
