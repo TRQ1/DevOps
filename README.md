@@ -11,6 +11,7 @@
 
 # Will do
 - Cloudformation
+- Create Pipline using Jenkins-CLI when provision image via Docker
 
 # Do now
 - Build a Docker container with jenkins by using Packer
