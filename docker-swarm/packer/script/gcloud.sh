@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#Check aws env-vars
+#Check gclod env-vars
 if [[ -z $GCP_KEY_FILE || -z $GCP_PROJECT_ID ]]; then
   echo "GCLOUD_KEY_FILE, GCLOUD_PROJECT_ID must be set." 
   exit 1;

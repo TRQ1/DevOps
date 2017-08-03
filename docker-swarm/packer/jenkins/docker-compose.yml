@@ -3,6 +3,8 @@ version: '3.3'
 services:
  
   master:
+    deploy:
+      mode: global
     image: ${JENKINS_IMAGE:-my/jenkins}
     ports:
       - ${JENKINS_PORT:-4749}:8080
@@ -13,6 +15,8 @@ services:
    
   slave:
     image: vipconsult/jenkins-swarm-agent
+    deploy:
+      mode: global
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp:/tmp

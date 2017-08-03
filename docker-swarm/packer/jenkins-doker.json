@@ -1,6 +1,6 @@
 {
   "variables": { 
-    "gcp-project-id": "{{env `gcp-project-id`}}",
+    "gcp_project_id": "{{env `gcp_project_id`}}",
     "home": "{{env `HOME`}}",
     "os_variant": "ubuntu-1604",
     "aws_access_key_id": "{{env `aws_access_key_id`}}",
@@ -13,10 +13,10 @@
   },
   "builders": [{
     "type": "googlecompute",
-    "account_file": "{{ user `home`}}/.gcp/{{ user `gcp-project-id`}}/{{ user `gcp-project-id`}}.json", 
+    "account_file": "{{ user `home`}}/.gcp/{{ user `gcp_project_id`}}/{{ user `gcp_project_id`}}.json", 
     "zone": "us-central1-c",
     "machine_type": "n1-standard-1",
-    "project_id": "{{ user `gcp-project-id`}}",
+    "project_id": "{{ user `gcp_project_id`}}",
     "source_image": "ubuntu-1604-xenial-v20170619a",
     "image_name" : "swarm-{{user `os_variant`}}-v{{timestamp}}",    
     "image_description" : "This is a Jenkins ubuntu image.",
@@ -26,8 +26,8 @@
   "provisioners": [
       {
       "type": "file",
-      "source": "{{ user `home`}}/.gcp/{{ user `gcp-project-id`}}/{{ user `gcp-project-id`}}.json",
-      "destination": "~/{{ user `gcp-project-id`}}.json"
+      "source": "{{ user `home`}}/.gcp/{{ user `gcp_project_id`}}/{{ user `gcp_project_id`}}.json",
+      "destination": "~/{{ user `gcp_project_id`}}.json"
       },
       {      
       "type": "shell",
@@ -42,13 +42,14 @@
         "AWS_SECRET_ACCESS_KEY={{user `aws_secret_access_key`}}",
         "AWS_REGION={{user `aws_region`}}",
         "GCP_KEY_FILE={{user `gcp_key_filename`}}",
-        "GCP_PROJECT_ID={{user `gcp-project-id`}}"
+        "GCP_PROJECT_ID={{user `gcp_project_id`}}"
       ],
-      "pause_before": "30s"
+      "pause_before": "60s",
+      "start_retry_timeout": "2m"
       },
       {
       "type": "shell",
-      "inline": "cd ~/ && mkdir jenkins && rm -f ~/{{ user `gcp-project-id`}}.json"
+      "inline": "cd ~/ && mkdir jenkins && rm -f ~/{{ user `gcp_project_id`}}.json"
       },
       {
       "type": "file",
